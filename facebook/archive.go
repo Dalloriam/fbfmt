@@ -1,8 +1,11 @@
 package facebook
 
 import (
+	"fmt"
 	"os"
 	"strings"
+
+	"sync"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -27,11 +30,37 @@ func NewArchive(archivePath string) (*Archive, error) {
 		return nil, err
 	}
 
-	doc.Find(".thread").Each(func(i int, s *goquery.Selection) {
+	owner := strings.TrimSpace(doc.Find("h1").First().Text())
 
-	})
+	// Open the thread input channel & the Thread output channel
+	nodeChan := make(chan *goquery.Selection)
+	threadChan := make(chan *Thread)
+	var wg sync.WaitGroup
 
-	return &Archive{}, nil
+	// Start the thread consumers
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go ThreadConsumer(owner, nodeChan, threadChan, &wg)
+	}
+
+	// Start the thread producer
+	go func() {
+		doc.Find(".thread").Each(func(i int, s *goquery.Selection) {
+			nodeChan <- s
+		})
+		close(nodeChan)
+	}()
+
+	go func() {
+		wg.Wait()
+		close(threadChan)
+	}()
+
+	for arc := range threadChan {
+		fmt.Println(arc.Participants)
+	}
+
+	return &Archive{Owner: owner}, nil
 }
 
 // GetThreadByUser find all threads with a specific facebook user
