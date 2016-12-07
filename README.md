@@ -2,7 +2,7 @@
 
 ## Installation
 ```bash
-$ go get -u github.com/Dalloriam/fbfmt
+$ go get github.com/Dalloriam/fbfmt
 ```
 
 ## Usage
