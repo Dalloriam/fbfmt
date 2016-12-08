@@ -59,7 +59,12 @@ func NewArchive(archivePath string, search string) (*Archive, error) {
 
 	for arc := range threadChan {
 		for _, part := range arc.Participants {
-			if strings.Contains(part, search) {
+			if search != "" {
+				if strings.Contains(part, search) {
+					threads = append(threads, arc)
+					break
+				}
+			} else {
 				threads = append(threads, arc)
 				break
 			}

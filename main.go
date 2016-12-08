@@ -19,7 +19,7 @@ var searchTerm string
 func init() {
 	flag.StringVar(&inPath, "In", "messages.htm", "Path to facebook .HTM file")
 	flag.StringVar(&outPath, "Out", "out.json", "Output JSON file to create")
-	flag.StringVar(&searchTerm, "Search", ",", "Search term")
+	flag.StringVar(&searchTerm, "Search", "", "Search term")
 	flag.Parse()
 }
 
